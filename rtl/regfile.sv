@@ -37,6 +37,9 @@ module regfile #(
     enum {NORMAL, SPECULATE, MISS_PRED} state, next_state;
 
     always_comb begin
+        // default:
+        next_state = NORMAL;
+        
         case(state)
             NORMAL:     if (save_regfile_state_i)           next_state = SPECULATE;
                         else                                next_state = NORMAL;
