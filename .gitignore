@@ -31,3 +31,7 @@ mwe/apr/design_lib
 *.tar.gz
 *.key
 simv
+*.lib
+*.LIB
+*.db
+*.DB
