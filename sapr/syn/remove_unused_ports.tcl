@@ -1,0 +1,1 @@
+../src/syn/remove_unused_ports.tcl

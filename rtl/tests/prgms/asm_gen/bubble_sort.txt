@@ -1,0 +1,23 @@
+// bubble sort algo on elements in addresses 0-29 in memory
+// (length can be adjusted by changeing assembly instruction)
+
+addi, x10, x0, 30  // Sort first N addresses
+addi, x11, x10, -1
+
+
+addi, x8,  x0, 0   // address to check
+addi, x9,  x0, 0   // switches made count reset to zero
+
+// LOOP:
+lw,   x1,  x8, 0  // x1 = DMEM[x8]
+lw,   x2,  x8, 1  // x2 = DMEM[x8+1]
+bge,  x2,  x1, 4  // skip value swap if sorted
+
+sw,   x8,  x2, 0
+sw,   x8,  x1, 1
+addi, x9,  x9, 1  // x9++ (num_switches++)
+
+addi, x8,  x8, 1  // x8++ (address++)
+blt,  x8, x11, -7 // continue swapping
+blt,  x0,  x9, -10 // if (0 < num_switches) rerun swap sweep
+j, 0 // loop forever (DONE)

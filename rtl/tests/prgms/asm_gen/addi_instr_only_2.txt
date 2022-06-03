@@ -1,0 +1,5 @@
+// simply fill each register with an immediate value
+ADDI, X1, X0, 1
+ADDI, X2, X0, 2
+ADDI, X3, X0, 3
+ADDI, x4, x3, 10

@@ -1,0 +1,44 @@
+addi  , x1, x0, 1 
+slli  , x2, x1, 15
+addi  , x3, x1, 0
+addi  , x4, x2, 0
+srli  , x4, x4, 2  // Loop Start
+xor    , x4, x4, x2
+slli  , x3, x3, 2
+xor    , x3, x3, x1
+xor    , x5, x4, x3 // Loop End
+srli  , x4, x4, 2  // Loop Start
+xor    , x4, x4, x2
+slli  , x3, x3, 2
+xor    , x3, x3, x1
+xor    , x6, x4, x3 // Loop End
+srli  , x4, x4, 2  // Loop Start
+xor    , x4, x4, x2
+slli  , x3, x3, 2
+xor    , x3, x3, x1
+xor    , x7, x4, x3 // Loop End
+srli  , x4, x4, 2  // Loop Start
+xor    , x4, x4, x2
+slli  , x3, x3, 2
+xor    , x3, x3, x1
+xor    , x8, x4, x3 // Loop End
+srli  , x4, x4, 2  // Loop Start
+xor    , x4, x4, x2
+slli  , x3, x3, 2
+xor    , x3, x3, x1
+xor    , x9, x4, x3 // Loop End
+srli  , x4, x4, 2  // Loop Start
+xor    , x4, x4, x2
+slli  , x3, x3, 2
+xor    , x3, x3, x1
+xor    , x10, x4, x3 // Loop End
+srli  , x4, x4, 2  // Loop Start
+xor    , x4, x4, x2
+slli  , x3, x3, 2
+xor    , x3, x3, x1
+xor    , x11, x4, x3 // Loop End
+srli  , x4, x4, 2  // Loop Start
+xor    , x4, x4, x2
+slli  , x3, x3, 2
+xor    , x3, x3, x1
+xor    , x12, x4, x3 // Loop End
