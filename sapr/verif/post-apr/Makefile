@@ -24,6 +24,8 @@ all: $(TARGETS)
 
 # simulation entries
 $(VCS_FOLDER)/OoO_top.vpd: $(OOO_TOP_FILES)
+	if [ ! -d $(LOGS_FOLDER) ]; then mkdir $(LOGS_FOLDER); fi
+	if [ ! -d $(VCS_FOLDER) ]; then mkdir $(VCS_FOLDER); fi
 	vcs $(OOO_TOP_FILES) +v2k +vcs+vcdpluson +neg_tchk -R +lint=all -sverilog -full64 -debug_pp -timescale=1ns/10ps -l $(subst $(VCS_FOLDER),$(LOGS_FOLDER), $@).log
 	mv vcdplus.vpd $@
 
