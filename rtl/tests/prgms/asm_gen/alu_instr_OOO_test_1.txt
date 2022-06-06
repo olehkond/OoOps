@@ -24,3 +24,4 @@ sw  , x7, x5, 1 // dmem[15] = 4
 lw  , x8, x7, 1 // x8 = dmem[15] (4)
 sw  , x7, x6, 1 // dmem[15] = 6
 lw  , x8, x7, 1 // x8 = dmem[15] (6)
+j, 0

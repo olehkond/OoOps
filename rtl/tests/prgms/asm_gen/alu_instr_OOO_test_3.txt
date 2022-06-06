@@ -14,3 +14,4 @@ addi, x7, x2, 25
 xori, x8, x0, 25
 SLLI,  x9, x8, 2
 add, x10, x9, x8
+j, 0

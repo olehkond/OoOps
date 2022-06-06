@@ -27,21 +27,15 @@ module branch_pred #(
 
     logic                       branch_predicted;
 
-    function automatic logic majority1(input word32_t val, input int width);
-        int num1s;
-    
-        for (int i = 0; i < width; ++i) begin
-            if (val[i] == '1) ++num1s;
-        end
-        return (num1s > (width/2)) ? '1 : '0;
-    endfunction
-
     // sign extend jump immediate value
     assign br_imm_se_sh = $signed(br_imm_i << 2);
 
     // decide whether to take branch by referencing branch history table
     // against the current pattern.
-    assign br_taken_o = branch_table[history];
+    //assign br_taken_o = branch_table[history];
+    always_comb begin
+        br_taken_o = branch_table[history];
+    end
 
     // if branch taken jump PC by value in immediate, else go to next instruction
     assign program_counter_branched_o = (program_counter_i + br_imm_se_sh);
@@ -49,16 +43,9 @@ module branch_pred #(
     
     always_ff @(posedge clk_i) begin
         if (reset_i) begin
-            // initialize with simple rule that if history contains more 1's than 0's
-            // then take that branch
-            for (int i = 0; i < 2**HISTORY_BITS; ++i) begin
-                branch_table[i] <= majority1(i, HISTORY_BITS);
-            end
+            branch_table <= '0;//majority1(i, HISTORY_BITS);
 
-            // reset history to alternating 1's and 0's
-            for (int i = 0; i < HISTORY_BITS; ++i) begin
-                history[i] <= i[0];
-            end
+            history <= '0;
         end else begin
             if (issuing_branch_i) begin
                 branch_predicted <= br_taken_o;

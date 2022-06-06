@@ -1,0 +1,10 @@
+type = offset
+defaultOffset = 300.0
+
+#N, 20.1
+clk, layer=M3 +0.4
+reset, layer=M3 +0.4
+start_accum, layer=M3 +0.4
+
+#E, 18
+accum_data[15:0], layer=M2, pitch=0.4 +0.4 

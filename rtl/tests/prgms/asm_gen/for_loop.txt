@@ -27,3 +27,4 @@ lw,   x12, x0, 1 // store x3 (DMEM[1]) in x12 at end of loop
 blt,  x5,  x1, -10 // should never be taken
 addi, x7,  x7, 1 // incr for loop count
 blt, x7, x10, -13
+j, 0

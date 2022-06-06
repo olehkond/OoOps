@@ -10,3 +10,4 @@ addi, x4, x3, 1
 addi, x3, x4, 1
 addi, x5, x2, 20
 addi, x6, x2, 25
+j, 0

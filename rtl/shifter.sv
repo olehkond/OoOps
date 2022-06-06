@@ -42,6 +42,9 @@ module shifter #(
         // default:
         left = '0;
         tag = TAG;
+        ft_low  = 'x;
+        ft_mid  = 'x;
+        ft_high = 'x;
 
         case (oper_i)
             // logical shift right

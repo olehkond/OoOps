@@ -9,3 +9,4 @@ addi,  x1, x2, 0
 addi,  x2, x4, 0
 addi,  x3, x3, -1  // decrement loop variable
 bne,   x3, x0, -4 // if x3 != 0, branch to LOOP
+j, 0

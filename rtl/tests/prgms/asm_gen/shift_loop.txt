@@ -42,3 +42,4 @@ xor    , x4, x4, x2
 slli  , x3, x3, 2
 xor    , x3, x3, x1
 xor    , x12, x4, x3 // Loop End
+j, 0

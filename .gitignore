@@ -27,7 +27,6 @@ mwe/apr/design_lib
 **/csrc
 **/WORK
 **/alib-52
-*.tpl
 *.tar.gz
 *.key
 simv
