@@ -11,6 +11,7 @@ module shifter #(
     input word32_t      rs2_val_i,
     input logic         ready_i,
     input logic         clk_i,
+    input logic         reset_i,
     
     // outputs
     output cdb_t        cdb_term_o
@@ -174,20 +175,20 @@ module shifter #(
 
     // Broadcast/WB stage behavior
     always_ff @(posedge clk_i) begin
-        if (~ready_i) begin
-            tag_broad <= NO_VAL;
+        if (ready_i) begin
+            cdb_term_o.tag  <= tag;
+            cdb_term_o.val  <= rd_val;
+        end else begin
+            cdb_term_o.tag  <= NO_VAL;
             // rd_val can be anything, since the tag is NO_VAL, no RS
             // will use that value
-        end else begin
-            tag_broad     <= tag;
-            rd_val_broad  <= rd_val;
         end
     end
 
 
     // term to broadcast on common data bus (either NO_VAL, or TAG param)
     // paired with calculated value and regfile index
-    assign cdb_term_o.tag = tag_broad;
-    assign cdb_term_o.val = rd_val_broad;
+    //assign cdb_term_o.tag = tag_broad;
+    //assign cdb_term_o.val = rd_val_broad;
 
 endmodule

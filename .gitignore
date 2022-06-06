@@ -35,4 +35,8 @@ simv
 *.db
 *.DB
 **/command.log
-**/OoO_top_port_map.*
+**/icc_output.txt
+OoO_top_port_map.*
+*.vpd
+**/filenames*
+**/Synopsys_stack_trace*

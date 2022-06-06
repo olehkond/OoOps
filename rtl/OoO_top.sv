@@ -482,6 +482,7 @@ module OoO_top (
                     .rs2_val_i  ( fu_rs2_val[i]  ), // word32_t
                     .ready_i    ( fu_ready[i]    ), // logic
                     .clk_i      ( clk_i          ), // logic
+                    .reset_i    ( reset_i        ), // logic
 
                     // outputs
                     .cdb_term_o ( br_res_cdb[i]  )  // cdb_t
@@ -493,6 +494,7 @@ module OoO_top (
                     .rs2_val_i  ( fu_rs2_val[i]               ), // word32_t
                     .ready_i    ( fu_ready[i]                 ), // logic
                     .clk_i      ( clk_i                       ), // logic
+                    .reset_i    ( reset_i                     ), // logic
 
                     // outputs
                     .cdb_term_o ( br_res_cdb[i]               )  // cdb_t

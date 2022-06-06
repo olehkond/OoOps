@@ -61,7 +61,7 @@ typedef enum logic [2:0] {
 
 
 
-parameter NUM_ALU_RS = 4;
+parameter NUM_ALU_RS = 6;
 parameter NUM_SHIFT_RS = 2;
 // + 1 to include LD/ST Unit and another + 1 to include branch alu
 parameter NUM_RS = NUM_ALU_RS + NUM_SHIFT_RS + 2;
@@ -78,6 +78,8 @@ typedef enum logic[$clog2(NUM_TAGS)-1:0] {
     ALU_2,       // ALU 2
     ALU_3,       // ALU 3
     ALU_4,       // ALU 4
+    ALU_5,       // ALU 5
+    ALU_6,       // ALU 6
     SHIFT_1,     // Shifter 1
     SHIFT_2,     // Shifter 2
     LS_1,
@@ -96,7 +98,7 @@ parameter rs_tag_t  LS_RS_STATION [2**LS_ENTRIES_POW2] =
                             '{LS_1, LS_2, LS_3, LS_4, LS_5, LS_6, LS_7, LS_8};
 
 parameter rs_tag_t  ALU_RS_STATION [NUM_ALU_RS]
-                                              = '{ALU_1, ALU_2, ALU_3, ALU_4};
+                                = '{ALU_1, ALU_2, ALU_3, ALU_4, ALU_5, ALU_6};
 
 parameter rs_tag_t  SHIFT_RS_STATION [NUM_SHIFT_RS]
                                               = '{SHIFT_1, SHIFT_2};
