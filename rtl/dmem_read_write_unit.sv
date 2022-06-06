@@ -78,6 +78,24 @@ module dmem_read_write_unit (
                                         end
                                         lsu_read_o = '1;
                                     end
+                        default:    begin
+                                        // default:
+                                        state_next = IDLE;
+                                        lsu_read_o = '0;
+                                        cdb_load_o.tag = NO_VAL;
+                                        cdb_load_o.val = 'x;
+
+                                        // load-only signals
+                                        dmem_read_o = '0;
+
+                                        // store-only signals
+                                        dmem_write_o = '0;
+                                        dmem_data_o = 'x;
+
+                                        // address to write to on store
+                                        // address to read from on load
+                                        dmem_addr_o = 'x;
+                                    end
                     endcase
             // ----------------------------------------------------------------
             LOAD:   begin
@@ -122,6 +140,23 @@ module dmem_read_write_unit (
                             state_next = IDLE;
                             cdb_load_o.tag = load_tag;
                             cdb_load_o.val = dmem_rd_data_i;
+                        end else begin
+                            // default:
+                            state_next = IDLE;
+                            lsu_read_o = '0;
+                            cdb_load_o.tag = NO_VAL;
+                            cdb_load_o.val = 'x;
+
+                            // load-only signals
+                            dmem_read_o = '0;
+
+                            // store-only signals
+                            dmem_write_o = '0;
+                            dmem_data_o = 'x;
+
+                            // address to write to on store
+                            // address to read from on load
+                            dmem_addr_o = 'x;
                         end
                     end
                     /*casez({lsu_empty_i, lsu_load_i, dmem_done_i, lsu_instr_ready_i})
