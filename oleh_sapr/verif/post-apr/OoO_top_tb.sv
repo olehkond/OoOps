@@ -1,11 +1,24 @@
 
+//`define PRGM_FILE "prgms/addi_instr_only.mem"
 //`define PRGM_FILE "prgms/alu_instr_OOO_test_1.mem"
 //`define PRGM_FILE "test_program.mem"
 //`define PRGM_FILE "prgms/alu_instr_only_with_noops.mem"
 //`define PRGM_FILE "prgms/alu_instr_OOO_test_3.mem"
-//`define PRGM_FILE "prgms/one_of_every_instr.mem
-`define PRGM_FILE "prgms/for_loop.mem"
+//`define PRGM_FILE "prgms/one_of_every_instr.mem"
+//`define PRGM_FILE "prgms/reg_reg_instr.mem"
+//`define PRGM_FILE "prgms/interweave_instr_types.mem"
+//`define PRGM_FILE "prgms/basic_branch_test.mem"
+//`define PRGM_FILE "prgms/for_loop.mem"
+`define PRGM_FILE "prgms/bubble_sort.mem"
+//`define PRGM_FILE "prgms/basic_for_loop.mem"
 //`define PRGM_FILE "prgms/fibonacci.mem"
+
+
+`define MEM_INIT_FILE "mem/init/random.mem"
+`define MEM_START_FILE "mem/sim_res/mem_start_state.mem"
+`define MEM_END_FILE "mem/sim_res/mem_end_state.mem"
+`define REG_END_FILE "mem/sim_res/reg_end_state.mem"
+
 
 import data_types::*;
 
@@ -33,7 +46,7 @@ module OoO_top_tb();
     word32_t  dmem_addr_o;
     word32_t  dmem_data_o;
     
-    localparam CLOCK_PERIOD = 9;
+    localparam CLOCK_PERIOD = 10;
 
     // clock init
     initial begin
@@ -47,7 +60,9 @@ module OoO_top_tb();
     
     // ========================================================================
     // data memory model
-    basic_dmem_model #(.LATENCY(DMEM_LATENCY), .SIZE_POW2(DMEM_SIZE_POW2)) dmem_unit (
+    basic_dmem_model #(.LATENCY(DMEM_LATENCY),
+                       .SIZE_POW2(DMEM_SIZE_POW2),
+                       .MEM_INIT_FILE(`MEM_INIT_FILE)) dmem_unit (
         .clk_i          ( clk_i             ),
         .reset_i        ( reset_i           ),
 
@@ -61,7 +76,7 @@ module OoO_top_tb();
     );
 
 
-    localparam INSTRUC_MEM_SIZE = 2**10;
+    localparam INSTRUC_MEM_SIZE = 2**12;
 
     logic [7:0] instr_mem [INSTRUC_MEM_SIZE];
 
@@ -71,6 +86,11 @@ module OoO_top_tb();
                             instr_mem[program_counter_o]     };
 
     localparam word32_t NOOP = 32'b00000_00000_000000000000_000_0010011;
+
+    integer mem_start_file;
+    integer mem_end_file;
+    integer reg_end_file;
+    integer concat;
 
     initial begin
         $vcdpluson;
@@ -90,8 +110,36 @@ module OoO_top_tb();
         repeat(2) @(posedge clk_i);
         reset_i <= '0;
 
-        repeat(2000) @(posedge clk_i);
+        // write memory content at start to file
+        mem_start_file = $fopen(`MEM_START_FILE, "w");
+        for (int i = 0; i < 2**DMEM_SIZE_POW2; i = i + 4) begin
+            concat = {  dmem_unit.memory[i+3],
+                        dmem_unit.memory[i+2],
+                        dmem_unit.memory[i+1],
+                        dmem_unit.memory[i  ]};
+            $fdisplay(mem_start_file, "%d", concat);
+        end
+        $fclose(mem_start_file);
 
+        
+        // ====================================================================
+        // RUN PROGRAM
+        // ====================================================================
+        repeat(300000) @(posedge clk_i);
+        // ====================================================================
+        // ====================================================================
+
+        // write memory content at end to file
+        mem_end_file = $fopen(`MEM_END_FILE, "w");
+        for (int i = 0; i < 2**DMEM_SIZE_POW2; i = i + 4) begin
+            concat = {  dmem_unit.memory[i+3],
+                        dmem_unit.memory[i+2],
+                        dmem_unit.memory[i+1],
+                        dmem_unit.memory[i  ]};
+            $fdisplay(mem_end_file, "%d", concat);
+        end
+        $fclose(mem_end_file);
+        
         $vcdplusoff;
         $finish;
     end

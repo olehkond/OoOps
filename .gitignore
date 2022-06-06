@@ -35,3 +35,4 @@ simv
 *.db
 *.DB
 **/command.log
+**/OoO_top_port_map.*
