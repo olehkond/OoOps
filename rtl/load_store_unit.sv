@@ -1,29 +1,6 @@
 
 import data_types::*;
 
-typedef struct packed {
-    // each entry should have unique tag
-    rs_tag_t  tag;
-
-    // address for entry
-    rs_tag_t  addr_tag;
-    word32_t  addr;
-    word32_t  offset;
-    
-    // data for entry (only for store types)
-    rs_tag_t  data_st_tag;
-    word32_t  data_st;
-
-    logic     load; // 1 if load, 0 if store
-    word32_t  eff_addr;
-    logic     ready;
-    logic     locked;
-
-    // speculation flags
-    logic     speculative;
-    logic     cond_evaluated;
-    logic     corr_pred;
-} ls_t;
 
 module load_store_unit #(
     parameter SIZE_POW2 = 3

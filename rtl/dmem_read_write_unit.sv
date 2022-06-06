@@ -59,7 +59,7 @@ module dmem_read_write_unit (
         dmem_addr_o = 'x;
         
 
-        unique case(state)
+        case(state)
             //IDLE:   case({lsu_empty_i, lsu_load_last, lsu_instr_ready_i})
             IDLE:   case({lsu_empty_i, lsu_load_i, lsu_instr_ready_i})
                         3'b001:     begin 

@@ -4,8 +4,11 @@ package data_types;
 parameter DWIDTH = 32;
 typedef logic signed [DWIDTH-1:0] word32_t;
 
+
+
+
 // All possible ALU operations
-typedef enum {
+typedef enum logic [3:0] {
     // Register-Immediate types
     ADDI, // rd = rs1 + SE(imm12)
     SLTI, // rd = (rs1 < SE(imm12)) ? 1 : 0  (treat both as SIGNED)
@@ -27,7 +30,7 @@ typedef enum {
 // All Possible Shift operations
 
 
-typedef enum {
+typedef enum logic [2:0] {
     // immediate type shifts
     SRLI, // Logical Right Shift 
     SLLI, // Logical Left Shift
@@ -41,7 +44,7 @@ typedef enum {
 } shift_op_t;
 
 
-typedef enum {
+typedef enum logic [2:0] {
     // Branch types
     BEQ,  // PC = (rs1 == rs2) ? PC + SE(imm12) : PC + 4
     BNE,  // PC = (rs1 != rs2) ? PC + SE(imm12) : PC + 4
@@ -53,9 +56,23 @@ typedef enum {
 } branch_op_t;
 
 
+
+
+
+
+
+parameter NUM_ALU_RS = 4;
+parameter NUM_SHIFT_RS = 2;
+// + 1 to include LD/ST Unit and another + 1 to include branch alu
+parameter NUM_RS = NUM_ALU_RS + NUM_SHIFT_RS + 2;
+
+parameter LS_ENTRIES_POW2 = 3;
+
+parameter NUM_TAGS = NUM_ALU_RS + NUM_SHIFT_RS + (2**LS_ENTRIES_POW2) + 1; // +1 for NO_VAL
+
 // Tags for reservation stations/functional units
 // Additional tags can be added or removed as necessary
-typedef enum {
+typedef enum logic[$clog2(NUM_TAGS)-1:0] {
     NO_VAL = '0, // No value has been calculated this clk cycle
     ALU_1,       // ALU 1
     ALU_2,       // ALU 2
@@ -74,12 +91,7 @@ typedef enum {
 } rs_tag_t;
 
 
-parameter NUM_ALU_RS = 4;
-parameter NUM_SHIFT_RS = 2;
-// + 1 to include LD/ST Unit and another + 1 to include branch alu
-parameter NUM_RS = NUM_ALU_RS + NUM_SHIFT_RS + 2;
 
-parameter LS_ENTRIES_POW2 = 3;
 parameter rs_tag_t  LS_RS_STATION [2**LS_ENTRIES_POW2] =
                             '{LS_1, LS_2, LS_3, LS_4, LS_5, LS_6, LS_7, LS_8};
 
@@ -134,5 +146,28 @@ typedef enum logic [1:0] {
     BRANCH
 } functional_group_t;
 
+typedef struct packed {
+    // each entry should have unique tag
+    rs_tag_t  tag;
+
+    // address for entry
+    rs_tag_t  addr_tag;
+    word32_t  addr;
+    word32_t  offset;
+    
+    // data for entry (only for store types)
+    rs_tag_t  data_st_tag;
+    word32_t  data_st;
+
+    logic     load; // 1 if load, 0 if store
+    word32_t  eff_addr;
+    logic     ready;
+    logic     locked;
+
+    // speculation flags
+    logic     speculative;
+    logic     cond_evaluated;
+    logic     corr_pred;
+} ls_t;
 
 endpackage
