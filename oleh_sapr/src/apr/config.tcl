@@ -129,7 +129,7 @@ if {$PROCESS == "65LP"} {
    set MAX_TLUPLUS_FILE "cln65g+_1p09m+alrdl_rcbest_top2.tluplus"
    set MIN_TLUPLUS_FILE "cln65g+_1p09m+alrdl_rcworst_top2.tluplus"
    
-   # Antenna rules
+   # Antenna rules   // /home/lab.apps/vlsiapps/kits/tsmc/N65RF/1.0c/digital/Back_End/milkyway/tcbn65gplus_200a/clf/antennaRule_n65_9lm.tcl
    set ANTENNA_RULES_FILE "$TSMC_PATH/Back_End/milkyway/tcbn65gplus_200a/clf/antennaRule_n65_9lm.tcl"
 }
 

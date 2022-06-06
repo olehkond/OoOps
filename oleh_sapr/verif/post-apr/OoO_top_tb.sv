@@ -5,6 +5,7 @@
 //`define PRGM_FILE "prgms/alu_instr_OOO_test_3.mem"
 //`define PRGM_FILE "prgms/one_of_every_instr.mem
 `define PRGM_FILE "prgms/for_loop.mem"
+//`define PRGM_FILE "prgms/fibonacci.mem"
 
 import data_types::*;
 

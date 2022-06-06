@@ -21,7 +21,17 @@ source ${SCRIPTS_DIR}/library.tcl -echo
 # ==========================================================================
 # Read in the verilog, uniquify and save the CEL view.
 import_designs ../syn/results/$design_name.syn.v -format verilog -top $design_name
-link
+link -force
+
+set_dont_touch ls_unit/dmem_rd_data_i
+set_dont_touch ls_unit/dmem_rwu/lsu_st_data_i
+set_dont_touch ls_unit/dmem_rwu/lsu_eff_addr_i
+set_dont_touch register_file/read_addr1_i
+set_dont_touch register_file/read_addr2_i
+set_dont_touch issue_stage/iq_data_i
+#set_dont_touch 
+
+
 
 # TIMING CONSTRAINTS
 # ==========================================================================
