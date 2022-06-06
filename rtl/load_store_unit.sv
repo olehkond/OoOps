@@ -134,6 +134,13 @@ module load_store_unit #(
 
 
 
+    word32_t  dmem_rd_data;
+    word32_t  cdb_val;
+    always_comb begin
+        dmem_rd_data = dmem_rd_data_i;
+        cdb_val = cdb_i.val;
+    end
+
 
     
 
@@ -231,11 +238,11 @@ module load_store_unit #(
                 end else begin
                     if ((buff[i].addr_tag == cdb_i.tag) & (cdb_i.tag != NO_VAL)) begin
                         buff[i].addr_tag    <= NO_VAL;
-                        buff[i].addr        <= cdb_i.val;
+                        buff[i].addr        <= cdb_val;
                     end
                     if ((buff[i].data_st_tag == cdb_i.tag) & (cdb_i.tag != NO_VAL)) begin
                         buff[i].data_st_tag <= NO_VAL;
-                        buff[i].data_st     <= cdb_i.val;
+                        buff[i].data_st     <= cdb_val;
                     end
 
                     // speculation release
@@ -258,6 +265,8 @@ module load_store_unit #(
         end
     end
 
+
+    
 
 
     // ========================================================================
@@ -282,7 +291,7 @@ module load_store_unit #(
         .cdb_load_o         ( cdb_term_o                    ), // cdb_t
 
         // dmem interface
-        .dmem_rd_data_i     ( dmem_rd_data_i                ), // word32_t
+        .dmem_rd_data_i     ( dmem_rd_data                  ), // word32_t
         .dmem_done_i        ( dmem_done_i                   ), // logic
     
         .dmem_read_o        ( dmem_read_o                   ), // logic
