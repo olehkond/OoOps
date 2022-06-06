@@ -102,7 +102,7 @@ module branch_unit (
     always_comb begin
         next_state = NO_BR;
 
-        case (state)
+        /*case (state)
             NO_BR:      if (~write_i)                                     next_state = NO_BR;
                         else if ((tag1_i == NO_VAL) & (tag1_i == NO_VAL)) next_state = READY;
                         else                                              next_state = OP_WAIT;
@@ -111,7 +111,19 @@ module branch_unit (
                         else                                              next_state = OP_WAIT;
             // --------------------------------------------------------------------------
             READY:                                                        next_state = NO_BR;
-        endcase
+        endcase*/
+        if (state == NO_BR) begin
+            if (~write_i)                                     next_state = NO_BR;
+            else if ((tag1_i == NO_VAL) & (tag1_i == NO_VAL)) next_state = READY;
+            else                                              next_state = OP_WAIT;
+        // --------------------------------------------------------------------------
+        end else if (state == OP_WAIT) begin
+            if (ops_ready_next_cycle)                         next_state = READY;
+            else                                              next_state = OP_WAIT;
+        // --------------------------------------------------------------------------
+        end else if (state == READY) begin
+                                                              next_state = NO_BR;
+        end
     end
 
     always_ff @(posedge clk_i) begin
