@@ -140,12 +140,8 @@ module dmem_read_write_unit (
                             state_next = IDLE;
                             cdb_load_o.tag = load_tag;
                             cdb_load_o.val = dmem_rd_data_i;
-                        end else begin
-                            // default:
-                            state_next = IDLE;
+                            
                             lsu_read_o = '0;
-                            cdb_load_o.tag = NO_VAL;
-                            cdb_load_o.val = 'x;
 
                             // load-only signals
                             dmem_read_o = '0;
