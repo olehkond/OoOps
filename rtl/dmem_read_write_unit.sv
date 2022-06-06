@@ -80,20 +80,51 @@ module dmem_read_write_unit (
                                     end
                     endcase
             // ----------------------------------------------------------------
-            LOAD:                   begin
-                                        state_next = WAIT;
-                                        dmem_read_o = '1;
-                                        dmem_addr_o = lsu_eff_addr_i;
-                                    end
+            LOAD:   begin
+                        state_next = WAIT;
+                        dmem_read_o = '1;
+                        dmem_addr_o = lsu_eff_addr_i;
+                    end
             // ----------------------------------------------------------------
-            STORE:                  begin
-                                        state_next = WAIT;
-                                        dmem_write_o = '1;
-                                        dmem_addr_o = lsu_eff_addr_i;
-                                        dmem_data_o = lsu_st_data_i;
-                                    end
+            STORE:  begin
+                        state_next = WAIT;
+                        dmem_write_o = '1;
+                        dmem_addr_o = lsu_eff_addr_i;
+                        dmem_data_o = lsu_st_data_i;
+                    end
             // ----------------------------------------------------------------
-            WAIT:   casez({lsu_empty_i, lsu_load_i, dmem_done_i, lsu_instr_ready_i})
+            WAIT:   begin
+                        if (~dmem_done_i) begin
+                            state_next = WAIT;
+                        end else if (lsu_empty_i & dmem_done_i) begin
+                            state_next = IDLE;
+                            cdb_load_o.tag = load_tag;
+                            cdb_load_o.val = dmem_rd_data_i;
+                        end else if (~lsu_empty_i & ~lsu_load_i & dmem_done_i & lsu_instr_ready_i) begin
+                            if (lsu_specultative_i & ~lsu_corr_pred_i) begin
+                                state_next = IDLE;
+                            end else begin
+                                state_next = STORE;
+                            end
+                            lsu_read_o = '1;
+                            cdb_load_o.tag = load_tag;
+                            cdb_load_o.val = dmem_rd_data_i;
+                        end else if (~lsu_empty_i & lsu_load_i & dmem_done_i & lsu_instr_ready_i) begin
+                            if (lsu_specultative_i & ~lsu_corr_pred_i) begin
+                                state_next = IDLE;
+                            end else begin
+                                state_next = LOAD;
+                            end
+                            lsu_read_o = '1;
+                            cdb_load_o.tag = load_tag;
+                            cdb_load_o.val = dmem_rd_data_i;
+                        end else begin
+                            state_next = IDLE;
+                            cdb_load_o.tag = load_tag;
+                            cdb_load_o.val = dmem_rd_data_i;
+                        end
+                    end
+                    /*casez({lsu_empty_i, lsu_load_i, dmem_done_i, lsu_instr_ready_i})
             //WAIT:   casez({lsu_empty_i, lsu_load_last, dmem_done_i, lsu_instr_ready_i})
                         4'b??0?:    begin
                                         state_next = WAIT;
@@ -128,7 +159,7 @@ module dmem_read_write_unit (
                                         cdb_load_o.tag = load_tag;
                                         cdb_load_o.val = dmem_rd_data_i;
                                     end
-                    endcase
+                    endcase*/
         endcase
     end
     
