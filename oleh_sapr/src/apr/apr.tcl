@@ -23,13 +23,13 @@ source ${SCRIPTS_DIR}/library.tcl -echo
 import_designs ../syn/results/$design_name.syn.v -format verilog -top $design_name
 link -force
 
-set_dont_touch ls_unit/dmem_rd_data_i
-set_dont_touch ls_unit/dmem_rwu/lsu_st_data_i
-set_dont_touch ls_unit/dmem_rwu/lsu_eff_addr_i
-set_dont_touch register_file/read_addr1_i
-set_dont_touch register_file/read_addr2_i
-set_dont_touch issue_stage/iq_data_i
-set_dont_touch broadcast_station/fu_res_i 
+#set_dont_touch ls_unit/dmem_rd_data_i
+#set_dont_touch ls_unit/dmem_rwu/lsu_st_data_i
+#set_dont_touch ls_unit/dmem_rwu/lsu_eff_addr_i
+#set_dont_touch register_file/read_addr1_i
+#set_dont_touch register_file/read_addr2_i
+#set_dont_touch issue_stage/iq_data_i
+#-set_dont_touch broadcast_station/fu_res_i 
 #set_dont_touch functional_unit_1__genblk1_alu_fu/cdb_term_o_reg_tag__1_
 #set_dont_touch functional_unit_4__genblk1_alu_fu/cdb_term_o_reg_tag__2_
 #set_dont_touch functional_unit_4__genblk1_alu_fu/cdb_term_o_reg_tag__0_
@@ -106,3 +106,4 @@ source ${SCRIPTS_DIR}/report_drcs.tcl -echo
 report_drc -highlight -color green
 
 start_gui
+report_timing

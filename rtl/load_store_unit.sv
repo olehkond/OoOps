@@ -70,7 +70,8 @@ module load_store_unit #(
 
     // oper combinational logic
     always_comb begin
-        unique casez({write_i, read, full_o, empty})
+        oper = NOTHING;
+        casez({write_i, read, full_o, empty})
             'b01?0:  oper = READ;      // non-empty buff read
             'b1110:  oper = READ;      // read+write on full buff
             'b100?:  oper = WRITE;     // write to non-full buff
@@ -87,7 +88,10 @@ module load_store_unit #(
 
     // next pointer value logic
     always_comb begin
-        unique case(oper)
+        head_next=head;
+        tail_next=tail;
+        
+        case(oper)
             READ:       begin head_next=head;       tail_next=tail_plus1; end
             WRITE:      begin head_next=head_plus1; tail_next=tail;       end
             READ_WRITE: begin head_next=head_plus1; tail_next=tail_plus1; end

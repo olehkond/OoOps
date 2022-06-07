@@ -173,9 +173,9 @@ set CLK_PORT   "clk_i"
 
 # Frequency 
 if {$CORNER == "LOW"} {
-   set CLK_PERIOD 4
+   set CLK_PERIOD 5
 } elseif {$CORNER == "HIGH"} {
-   set CLK_PERIOD 4
+   set CLK_PERIOD 5
 }
 
 # Reset port

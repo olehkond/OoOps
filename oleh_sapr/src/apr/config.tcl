@@ -176,7 +176,7 @@ set PINPLACEMENT_TXT "./pin_placement.txt"
 set PINPLACEMENT_TCL "./pin_placement.tcl"
 
 # Set Min/Max Routing Layers and routing directions
-set MAX_ROUTING_LAYER "M6"
+set MAX_ROUTING_LAYER "M7"
 set MIN_ROUTING_LAYER "M1"
 set HORIZONTAL_ROUTING_LAYERS "M2 M4 M6 M8"
 set VERTICAL_ROUTING_LAYERS "M3 M5 M7"
