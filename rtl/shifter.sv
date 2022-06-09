@@ -1,3 +1,28 @@
+/*
+    Shifter Unit (ALU)
+    
+    Inputs:
+        shift_op_t oper_i:      Shift Operation
+        word32_t rs1_val_i:     register 1 value
+        word32_t rs2_val_i:     register 2 value
+        logic    ready_i,:      signal to initiate computation
+        logic    clk_i:         system clock
+
+
+    Outputs:
+        cdb_t    cdb_term_o:    common data bus term.
+                                Is NO_VAL unless valid instruction
+                                has been computed.
+
+
+    Parameters:
+        rs_tag_t TAG:           UNIQUE RS TAG
+                                NOTE: MUST match shift rs tag
+    
+    Description:
+        Funnel Shifter that performs SHIFT type instruction computations
+*/
+
 import data_types::*;
 
 `timescale 1ns/10ps
@@ -184,11 +209,4 @@ module shifter #(
             // will use that value
         end
     end
-
-
-    // term to broadcast on common data bus (either NO_VAL, or TAG param)
-    // paired with calculated value and regfile index
-    //assign cdb_term_o.tag = tag_broad;
-    //assign cdb_term_o.val = rd_val_broad;
-
 endmodule

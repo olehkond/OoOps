@@ -1,4 +1,39 @@
+/*
+    Basic Data Memory Model
+    
+    Inputs:
+        logic     clk_i:        System clock
+        logic     reset_i:      System reset
+        
+        logic     dmem_read_i:  Signal to initiate read
+        logic     dmem_write_i: Signal to initiate write
+        word32_t  dmem_addr_i:  Address to be read from/written to
+                                (Depending on size, will look at bottom N bits)
+        word32_t  dmem_data_i:  Data to be written in on write
 
+
+    Outputs:
+        word32_t dmem_rd_data_o:Data read out of memory on read
+        logic    dmem_done_o:   Signal to indicate memory usit is free for another
+                                load/store
+
+
+    Parameters:
+                LATENCY:        Artificial Latency for simulation purposes
+                SIZE_POW2:      Size of memory as a power of 2
+                MEM_INIT_FILE:  Path to file to initialize memory contents to
+    
+    Description:
+        =================================
+        ***NOT MEANT TO BE SYNTHESIZED***
+        =================================
+        This module is purely for simulation purposes and not
+        meant to translate to an actual memory module, but 
+        rather to emulate a memory with variable latency
+        in the form of the LATENCY param.
+*/
+
+`timescale 1ns/10ps
 
 import data_types::*;
 
@@ -18,11 +53,12 @@ module basic_dmem_model #(
     output word32_t dmem_rd_data_o,
     output logic    dmem_done_o
 );
-    
+    // Actual Memory
     logic [7:0] memory [2**SIZE_POW2];
 
     enum { IDLE, STORE, LOAD } state, state_next;
 
+    // Counter start signal on read or write
     logic start;
     assign start = dmem_read_i | dmem_write_i;
     
@@ -30,6 +66,8 @@ module basic_dmem_model #(
     word32_t                data_st;
     logic                   done_next;
 
+    // Counter to simulate latency for retrieving
+    // or writing data to memory
     counter #(.COUNT(LATENCY)) counter (
         .clk_i      ( clk_i         ), // logic
         .reset_i    ( reset_i       ), // logic
@@ -63,16 +101,21 @@ module basic_dmem_model #(
         end
     end
 
+    // Will look at bottom SIZE_POW2 bits to evaluate an address
     logic [SIZE_POW2-1:0] eff_address;
     assign eff_address = dmem_addr_i[SIZE_POW2-3:0] << 2; //{dmem_addr_i[SIZE_POW2-1:2], 2'd0};
 
+
+    // load/store behavior
     always_ff @(posedge clk_i) begin
         if (reset_i) begin
+            // initalize memory to memory file
             for (int i=0; i<2**SIZE_POW2; ++i) begin
                 $readmemb(MEM_INIT_FILE, memory);
             end
         end else begin
             if (LATENCY == 1) begin
+                // Special case for single cycle latency (doesn't use counter)
                 if (dmem_read_i) begin
                     dmem_rd_data_o <= {memory[eff_address + 3],
                                        memory[eff_address + 2],
@@ -110,7 +153,13 @@ module basic_dmem_model #(
 
 endmodule
 
+/*
+    Memory Counter Module
 
+    Description:
+        Purely for simulation purposes to simulate latency
+        in the memory module.
+*/
 module counter #(
     parameter COUNT = 1
 ) (
@@ -125,12 +174,15 @@ module counter #(
     logic [$clog2(COUNT):0] val_plus1;
     assign val_plus1 = val + 1;
 
+    // state enums
     enum { IDLE, COUNTING } state, state_next;
 
+    // done and done_next (next cycle) output flags
     localparam logic [$clog2(COUNT)-1:0] TOP_VAL = COUNT - 1;
     assign done_o      = (val       == TOP_VAL) & (state == COUNTING);
     assign done_next_o = (val_plus1 == TOP_VAL) & (state == COUNTING);
 
+    // state behavior
     always_comb begin
         // default
         state_next = IDLE;
@@ -144,6 +196,7 @@ module counter #(
         endcase
     end
 
+    // reset and normal behavior
     always_ff @(posedge clk_i) begin
         if (reset_i) begin
             state <= IDLE;

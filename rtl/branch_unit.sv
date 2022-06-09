@@ -1,21 +1,33 @@
 /*
-    Branch Unit (ALU)
+    Branch Evaluation Unit
     
     Inputs:
-
-
+        logic        reset_i:           System Reset
+        logic        clk_i:             System clock
+        cdb_t        cdb_i:             Common Data Bus
+        logic        write_i:           Write branch instruction to eval unit
+        branch_op_t  branch_op_type_i:  branch instruction type
+        rs_tag_t     tag1_i:            tag of value1 to be compared (NO_VAL if ready)
+        rs_tag_t     tag2_i:            tag of value2 to be compared (NO_VAL if ready)
+        word32_t     val1_i:            value1 to be compared (NO_VAL if ready)
+        word32_t     val2_i:            value2 to be compared (NO_VAL if ready)
+        logic        br_taken_i:        prediction of branch instr written to instr queue
+        logic        issuing_branch_i:  Is a branch instr written to instr queue this cycle
 
     Outputs:
-
-
-    Parameters:
+        logic       cond_eval_o:        On valid branch instr: condition has been evaluated
+        logic       corr_pred_o:        On valid branch instr: was prediction correct
+    
+    Description:
+        Branch condition evaluation unit 
 */
 
+`timescale 1ns/10ps
 
 import data_types::*;
 
 module branch_unit (
-    // 
+    // General Input signals
     input logic        reset_i,
     input logic        clk_i,
     input cdb_t        cdb_i,
@@ -41,7 +53,7 @@ module branch_unit (
     // ========================================================================
     input logic        issuing_branch_i
 );
-    res_station_t   br;
+    res_station_t   br; // memory for tags and values
     branch_op_t     br_op;
     logic           br_taken;
 
@@ -60,6 +72,7 @@ module branch_unit (
     // Logic on whether overwrite stored values (only for OP_WAIT state)
     logic write_op1, write_op2;
 
+    // flags to determine whether unnown value will be overwritten next cycle
     always_comb begin
         // defaults:
         write_op1 = '0;
@@ -98,7 +111,10 @@ module branch_unit (
 
     enum {NO_BR, OP_WAIT, READY} state, next_state;
 
+    // condition evaluated only in READY state
     assign cond_eval_o = (state == READY);
+
+    // state transition behavior
     always_comb begin
         next_state = NO_BR;
 
@@ -127,6 +143,7 @@ module branch_unit (
             br_taken <= br_taken_i;
         end
 
+        // update/overwrite tags and values on write or in response to CDB
         case (state)
             NO_BR:      if (write_i) begin
                             br.tag1 <= tag1_i;

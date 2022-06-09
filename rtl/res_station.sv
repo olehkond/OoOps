@@ -2,13 +2,37 @@
     Reservation Station
         
     Inputs:
+        logic       reset_i:        system reset
+        logic       clk_i:          system clock
+        cdb_t       cdb_i:          common data bus
+
+        logic       write_i:        issuing instruction to this res station
+        alu_op_t    alu_opcode_i:   alu opcode   (ignored if not alu RS)
+        shift_op_t  shift_opcode_i: shift opcode (ignored if not shift RS)
+        rs_tag_t    tag1_i:         tag for val1 (NO_VAL if ready)
+        rs_tag_t    tag2_i:         tag for val2 (NO_VAL if ready)
+        word32_t    value1_i:       value 1 (may get overwritten by cdb val if tag not NO_VAL)
+        word32_t    value2_i:       value 2 (may get overwritten by cdb val if tag not NO_VAL)
+        logic       spec_i:         is instruction speculatively issued
+        logic       cond_eval_i:    has branch condition been evaluated
+        logic       corr_pred_i:    was branch prediction correct
 
     Outputs:
+        logic       fu_ready_o:         signal function unit operands are ready
+        alu_op_t    fu_alu_oper_o:      send alu operation to functional unit (ignored if not alu FU)
+        shift_op_t  fu_shift_oper_o:    send shift operation to functional unit (ignored if not shift FU)
+        word32_t    fu_rs1_val_o:       value 1 to functional unit
+        word32_t    fu_rs2_val_o:       value 2 to functional unit
+        logic       busy_o:             signal to issue logic that RS is busy
 
 
     Parameters:
+        TAG: unique tag to be broadcast on CDB
 
-
+    Description:
+        Holds operands and monitors CDB for desired value.
+        NO_VAL indicates operands are ready. When both operands are ready
+        issue to functional unit pair.
 */
 
 import data_types::*;
@@ -18,7 +42,6 @@ import data_types::*;
 module res_station #(
     parameter rs_tag_t TAG = ALU_1
 ) (
-    // 
     input logic        reset_i,
     input logic        clk_i,
     input cdb_t        cdb_i,

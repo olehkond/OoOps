@@ -1,7 +1,60 @@
-import data_types::*;
+/*
+    Instruction Fetch Unit
+    
+    Inputs:
+        logic                clk_i:             System clock
+        logic                reset_i:           system reset
+        cdb_t                cdb_i:             Common data bus
+        word32_t             iq_data_i:         instruction fetched from instr queue
+        logic                iq_empty_i:        instruction queue empty flag
+        word32_t             reg_rd_data1_i:    register value1 read from regfile
+        word32_t             reg_rd_data2_i:    register value2 read from regfile
+        rs_tag_t             reg_tag1_rd_i:     register tag1 read from regfile
+        rs_tag_t             reg_tag2_rd_i:     register tag2 read from regfile
+        logic [NUM_RS-1:0]   busy_bus_i:        bust signals from reservation stations
+        logic                cond_eval_i:       has branch been evaluated
+        logic                corr_pred_i:       was predicted condition correct
+        rs_tag_t             tag_ld_i:          load tag to be broadcast on CDB
+
+    Outputs:
+        logic                iq_read_o:             read instruction from queue
+        regfile_idx_t        reg_rd_addr1_o:        address1 to read value from regfile
+        regfile_idx_t        reg_rd_addr2_o:        address2 to read value from regfile
+        logic                save_regfile_state_o:  signal regfile to switch to speculation mode
+        regfile_idx_t        reg_tag_addr1_o:       address1 to read tag from regfile
+        regfile_idx_t        reg_tag_addr2_o:       address2 to read tag from regfile
+        regfile_idx_t        reg_tag_wr_addr_o:     address to write tag to regfile
+        rs_tag_t             reg_wr_tag_o:          tag to write to regfile
+        logic                reg_tag_wr_en_o:       write enable (for tag) to regfile
+        logic [NUM_RS-1:0]   rs_write_en_o:         one-hot write signal to reservation station/branch unit/load-store unit
+        word32_t             rs_value1_o:           value1 issued
+        word32_t             rs_value2_o:           value2 issued
+        rs_tag_t             rs_tag1_o:             tag1 issued
+        rs_tag_t             rs_tag2_o:             tag2 issued
+        alu_op_t             alu_op_type_o:         alu operation (if alu instruction)
+        shift_op_t           shift_op_type_o:       shifter operation (if shift instruction)
+        branch_op_t          branch_op_type_o:      branch operation (if branch instruction)
+        logic                spec_o:                is instruction being issued speculatively
+        logic                write_o:               write instruction to load-store unit
+        logic                load_o:                1 if load instruction, 0 if store
+
+        rs_tag_t             addr_tag_o:            address tag to load-store unit
+        word32_t             addr_o:                address value to load-store unit
+        word32_t             offset_o:              offset to load-store unit
+        rs_tag_t             data_st_tag_o:         data tag to load-store unit
+        word32_t             data_st_o:             data value to load-store unit
+
+    Description:
+        The issue logic considers the instruction it is trying to issue and whether the appropriate
+        reservation station is available to decide whether to read from instruction queue, write
+        to the regfile, stall etc. Other considerations have to do with squashing a speculative
+        instruction in the case of a misprediction. Juggles very many things while also performing
+        instruction decoding.
+*/
 
 `timescale 1ns/10ps
 
+import data_types::*;
 
 module issue_logic (
     // general control inputs
@@ -132,6 +185,7 @@ module issue_logic (
 
     assign stall = (state == STALL) | (next_state == STALL);// ((state == NR_I) | (state == R_I)) & (rs_write_en_pbr == '0);
 
+    // State transition behavior
     always_comb begin
         iq_read_o = '0;
         write_rs = '0;
@@ -178,6 +232,7 @@ module issue_logic (
         endcase
     end
 
+    // Tracking logic for whether instruction is valid
     always_ff @(posedge clk_i) begin
         if (reset_i) begin
             state       <= NR_NI;
@@ -290,9 +345,7 @@ module issue_logic (
             
                 // ==================================================================================================
                 // Load Store signals
-                // addr_tag_pos      <= (cdb_i.tag == reg_tag1_rd_i & (cdb_i.tag != NO_VAL)) ? NO_VAL    : reg_tag1_rd_i;
                 addr_pos          <= (cdb_i.tag == reg_tag1_rd_i & (cdb_i.tag != NO_VAL)) ? cdb_i.val : reg_rd_data1_i;
-                // data_st_tag_pos   <= (cdb_i.tag == reg_tag2_rd_i & (cdb_i.tag != NO_VAL)) ? NO_VAL    : reg_tag2_rd_i;
                 data_st_pos       <= (cdb_i.tag == reg_tag2_rd_i & (cdb_i.tag != NO_VAL)) ? cdb_i.val : reg_rd_data2_i;
                 offset_o        <= instr_imm;
                 load_o          <= load;
@@ -320,9 +373,7 @@ module issue_logic (
             
                 // ==================================================================================================
                 // Load Store signals
-                // addr_tag_pos      <= (cdb_i.tag == rs_tag1_pos & (cdb_i.tag != NO_VAL)) ? NO_VAL    : addr_tag_pos;
                 addr_pos          <= (cdb_i.tag == rs_tag1_pos & (cdb_i.tag != NO_VAL)) ? cdb_i.val : addr_pos;
-                // data_st_tag_pos   <= (cdb_i.tag == rs_tag2_pos & (cdb_i.tag != NO_VAL)) ? NO_VAL    : data_st_tag_pos;
                 data_st_pos       <= (cdb_i.tag == rs_tag2_pos & (cdb_i.tag != NO_VAL)) ? cdb_i.val : data_st_pos;
                 offset_o        <= offset_o;
                 load_o          <= load_o;
@@ -353,9 +404,9 @@ module issue_logic (
     // ====================================================================================================
 
 
-    assign addr_tag_o      = rs_tag1_o;     //(cdb_i.tag == rs_tag1_pos & (cdb_i.tag != NO_VAL)) ? NO_VAL    : addr_tag_pos;
+    assign addr_tag_o      = rs_tag1_o;
     assign addr_o          = (cdb_i.tag == rs_tag1_pos & (cdb_i.tag != NO_VAL)) ? cdb_i.val : addr_pos;
-    assign data_st_tag_o   = rs_tag2_o;     //(cdb_i.tag == rs_tag2_pos & (cdb_i.tag != NO_VAL)) ? NO_VAL    : data_st_tag_pos;
+    assign data_st_tag_o   = rs_tag2_o;
     assign data_st_o       = (cdb_i.tag == rs_tag2_pos & (cdb_i.tag != NO_VAL)) ? cdb_i.val : data_st_pos;
 
 
@@ -365,13 +416,14 @@ module issue_logic (
 
 
 
-
+    // determines whether to write to regfile
     assign reg_tag_wr_en_o   = (rs_write_en_pbr == '0)              ? '0 :
                                (cond_eval_i & ~corr_pred_i)         ? '0 :
                                (sp_state == SQUASH)                 ? '0 :
                                (instr_type_stall == LS & load_o)    ? '1 :
                                (instr_type_stall == LS & ~load_o)   ? '0 : reg_tag_wr_en_stall;
     
+    // address to write to regfile
     assign reg_tag_wr_addr_o = (stall_last_cyc & (next_state != STALL)) ? rd_idx : reg_tag_wr_addr_pos;
 
 
@@ -550,8 +602,9 @@ module issue_logic (
 
 
     logic store_instr;
-
-    // instruction decoding
+    // ========================================================================
+    // Instruction Decoding
+    // ========================================================================
     always_comb begin
         reg_tag_wr  = '0; // does this instr write to regfile upon exectution
 
@@ -568,6 +621,9 @@ module issue_logic (
             // -------------------------------------
             // Branches
             // -------------------------------------
+            // NOTE: While branches have immediates, that gets remembered by instruction
+            // fetch unit and eval unit only determines if condition is evaluated so
+            // 'immediate' flag is defined as LOW, even if it technically has an immediate
             
             // 22'b?????_???????_???_1100111: begin : _JMP // NOTE: WILL NEVER SEE THIS INSTR
             //     immediate = '0;
@@ -580,7 +636,6 @@ module issue_logic (
             // end
             22'b?????_???????_000_1100011: begin : _BEQ
                 immediate = '0;
-                // instr_imm = $signed({iq_data_i[31:27], iq_data_i[16:10]});
                 rs_free = '1; // NOTE: ASSUMING NO BR INSTR WILL BE READ UNTIL PRECEDING BRANCH EVALUATED THANKS TO UPSTREAM MODULE
                 br_op = BEQ;
                 reg_tag_wr = '0;
@@ -589,7 +644,6 @@ module issue_logic (
             end
             22'b?????_???????_001_1100011: begin : _BNE
                 immediate = '0;
-                // instr_imm = $signed({iq_data_i[31:27], iq_data_i[16:10]});
                 rs_free = '1;
                 br_op = BNE;
                 reg_tag_wr = '0;
@@ -598,7 +652,6 @@ module issue_logic (
             end
             22'b?????_???????_100_1100011: begin : _BLT
                 immediate = '0;
-                // instr_imm = $signed({iq_data_i[31:27], iq_data_i[16:10]});
                 rs_free = '1;
                 br_op = BLT;
                 reg_tag_wr = '0;
@@ -607,7 +660,6 @@ module issue_logic (
             end
             22'b?????_???????_101_1100011: begin : _BGE
                 immediate = '0;
-                // instr_imm = $signed({iq_data_i[31:27], iq_data_i[16:10]});
                 rs_free = '1;
                 br_op = BGE;
                 reg_tag_wr = '0;
@@ -616,7 +668,6 @@ module issue_logic (
             end
             22'b?????_???????_110_1100011: begin : _BLTU
                 immediate = '0;
-                // instr_imm = $signed({iq_data_i[31:27], iq_data_i[16:10]});
                 rs_free = '1;
                 br_op = BLTU;
                 reg_tag_wr = '0;
@@ -625,7 +676,6 @@ module issue_logic (
             end
             22'b?????_???????_111_1100011: begin : _BGEU
                 immediate = '0;
-                // instr_imm = $signed({iq_data_i[31:27], iq_data_i[16:10]});
                 rs_free = '1;
                 br_op = BGEU;
                 reg_tag_wr = '0;

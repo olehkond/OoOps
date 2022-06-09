@@ -1,3 +1,22 @@
+/*
+    Instruction Fetch Unit
+    
+    Inputs:
+        logic     clk_i;        system clock
+        logic     reset_i:      system reset
+
+        logic     cond_eval_i:  branch conidtion eval flag
+        logic     corr_pred_i:  was branch prediction correct
+        logic     iq_full_i:    is instruction queue full
+        word32_t  instr_i:      instructon fetched
+
+    Outputs:
+        logic [IMM_WIDTH-1:0] br_imm_o:             Branch immediate value
+        logic                 issuing_branch_o:     flag that branch is being written to instr queue
+        word32_t              program_counter_o:    current program counter value
+*/
+
+`timescale 1ns/10ps
 
 import data_types::*;
 
@@ -47,6 +66,7 @@ module instr_fetch_unit #(
     // FSM state behavior
     enum {NORMAL, SPECULATE} state, next_state;
 
+    // State transition behavior
     always_comb begin
         next_state = NORMAL;
 
@@ -79,8 +99,6 @@ module instr_fetch_unit #(
     logic branch_instr;
     localparam logic [6:0] JMP_OPCODE = 7'b1100111;
     localparam logic [6:0] BR_OPCODE  = 7'b1100011;
-    localparam logic [6:0] LD_OPCODE  = 7'b0000011;
-    localparam logic [6:0] ST_OPCODE  = 7'b0100011;
 
     assign instr_op = instr_i[6:0];
     assign jump_instr   = (instr_op == JMP_OPCODE);
@@ -117,17 +135,10 @@ module instr_fetch_unit #(
             SPECULATE:  begin
                             // CORRECT prediction
                             if (cond_eval_i & corr_pred_i) begin
-                                // act as if in normal state, but don't issue another branch immedietly
-                                /*if ((branch_instr) & ~iq_full_i) begin
-                                    issuing_branch_o    = '0; // '1;
-                                    iq_write_o          = '0; // '1'
-                                    program_counter_next= program_counter_o;
-                                    //program_counter_next= (br_taken_i) ? program_counter_branched_i :
-                                                                                //program_counter_o + 'd4;*/
+                                // act as if in normal state
                                 if ((branch_instr) & ~iq_full_i) begin
                                     issuing_branch_o    = '1;
                                     iq_write_o          = '1;
-                                    //program_counter_next= program_counter_o;
                                     program_counter_next= (br_taken_i) ? program_counter_branched_i :
                                                                                 program_counter_o + 'd4;
                                 end else if (~iq_full_i) begin

@@ -59,16 +59,25 @@ typedef enum logic [2:0] {
 
 
 
+// ==========================================================================
+// Number of Reservation Stations (Adjust to change config)
+// ==========================================================================
 
+parameter NUM_ALU_RS = 6;       // Number of ALU reservation stations
+parameter NUM_SHIFT_RS = 2;     // Number of shifter reservation stations
+parameter LS_ENTRIES_POW2 = 3;  // power of 2 of number of entries in load-store unit
 
-parameter NUM_ALU_RS = 6;
-parameter NUM_SHIFT_RS = 2;
+// Total number of reservation stations
 // + 1 to include LD/ST Unit and another + 1 to include branch alu
 parameter NUM_RS = NUM_ALU_RS + NUM_SHIFT_RS + 2;
 
-parameter LS_ENTRIES_POW2 = 3;
+// Number of tags
+// LS unit has multiple TAGS and branch unit has none, and +1 for NO_VAL
+parameter NUM_TAGS = NUM_ALU_RS + NUM_SHIFT_RS + (2**LS_ENTRIES_POW2) + 1;
 
-parameter NUM_TAGS = NUM_ALU_RS + NUM_SHIFT_RS + (2**LS_ENTRIES_POW2) + 1; // +1 for NO_VAL
+// ==========================================================================
+
+
 
 // Tags for reservation stations/functional units
 // Additional tags can be added or removed as necessary
@@ -93,7 +102,7 @@ typedef enum logic[$clog2(NUM_TAGS)-1:0] {
 } rs_tag_t;
 
 
-
+// TAG arrays
 parameter rs_tag_t  LS_RS_STATION [2**LS_ENTRIES_POW2] =
                             '{LS_1, LS_2, LS_3, LS_4, LS_5, LS_6, LS_7, LS_8};
 
@@ -110,7 +119,7 @@ typedef logic [$clog2(REGFILE_SIZE)-1:0] regfile_idx_t;
 
 
 // type/format to broadcast on common data bus
-// CDB will be of type:
+// CDB is of type:
 //      cdb_t cdb [NUM_RS];
 typedef struct packed {
     rs_tag_t		tag;
@@ -130,24 +139,7 @@ typedef struct packed {
     logic       speculative;
 } res_station_t;
 
-
-// Instruction Group Types
-// (riscv opcode decodings)
-/*typedef enum logic [2:0] {
-    OP,     // = 7'b011_0011;
-    OP_IMM, // = 7'b001_0011;
-    LOAD,   //  = 7'b000_0011;
-    STORE,  //  = 7'b010_0011;
-    BRANCH //  = 7'b110_0011; // unconditional branch
-} instruc_group_t;*/
-
-// Functional Group Type (alternative to using Instruction Group Types)
-typedef enum logic [1:0] {
-    ALU,
-    SHIFT,
-    BRANCH
-} functional_group_t;
-
+// Load store type in LS unit.
 typedef struct packed {
     // each entry should have unique tag
     rs_tag_t  tag;

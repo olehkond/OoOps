@@ -1,3 +1,29 @@
+/*
+    Top Level Module of Synthesizable OoO CPU Core
+    
+    Inputs:
+        logic     reset_i:          system reset
+        logic     clk_i:            system clock
+        word32_t  instr_fetch_i:    instruction fetched from instuction memory
+        word32_t  dmem_rd_data_i:   Data read of data memory
+        logic     dmem_done_i:      Data memory done performing load or store operation
+
+    Outputs:
+        word32_t program_counter_o: Program Counter to fetch instruction from memory
+        logic    dmem_read_o:       read signal to memory
+        logic    dmem_write_o:      write signal to memory
+        word32_t dmem_addr_o:       address to read or write to
+        word32_t dmem_data_o:       data to be written to memory (on store) 
+
+    Parameters:
+        ***ALL TOP LEVEL PARAMS SET IN data_types.sv***
+
+    Description:
+        Top level wiring of various components comprising OoO CPU core.
+        Generates various modules as appropriate
+*/
+
+`timescale 1ns/10ps
 
 import data_types::*;
 

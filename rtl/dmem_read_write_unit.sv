@@ -1,3 +1,35 @@
+/*
+    Data memory interface unit (for reading and writing)
+    
+    Inputs:
+        logic     clk_i:              System clock
+        logic     reset_i:            System reset
+
+        logic     lsu_empty_i:        Is load store unit empty
+        word32_t  lsu_eff_addr_i:     LS entry effective address (address + offset)
+        word32_t  lsu_st_data_i:      LS entry data to store (if a store)
+        rs_tag_t  lsu_ld_tag_i:       LS entry tag to broadcast on load
+        logic     lsu_load_i:         1 if entry is load, 0 when store
+        logic     lsu_instr_ready_i:  is LS entry ready to be read/written
+        logic     lsu_specultative_i: Was LS entry issued speculatively
+        logic     lsu_corr_pred_i:    Was the prediction correct
+        
+        word32_t  dmem_rd_data_i:     Data read out of memory
+        logic     dmem_done_i:        memory is done with load/store operation
+
+    Outputs:
+    
+    Description:
+        logic    lsu_read_o:          Read signal to load-store unit
+        cdb_t    cdb_load_o:          CDB value to be broadcast (on a load)
+        logic    dmem_read_o:         read signal to memory
+        logic    dmem_write_o:        write signal to memory
+        word32_t dmem_addr_o:         address to read or write to
+        word32_t dmem_data_o:         data to be written to memory (on store)
+    
+*/
+
+`timescale 1ns/10ps
 
 import data_types::*;
 
@@ -58,9 +90,8 @@ module dmem_read_write_unit (
         // address to read from on load
         dmem_addr_o = 'x;
         
-
+        // State behavior
         case(state)
-            //IDLE:   case({lsu_empty_i, lsu_load_last, lsu_instr_ready_i})
             IDLE:   case({lsu_empty_i, lsu_load_i, lsu_instr_ready_i})
                         3'b001:     begin 
                                         if (lsu_specultative_i & ~lsu_corr_pred_i) begin
@@ -137,6 +168,7 @@ module dmem_read_write_unit (
                             cdb_load_o.tag = load_tag;
                             cdb_load_o.val = dmem_rd_data_i;
                         end else begin
+                            // defaults
                             state_next = IDLE;
                             cdb_load_o.tag = load_tag;
                             cdb_load_o.val = dmem_rd_data_i;
@@ -155,46 +187,11 @@ module dmem_read_write_unit (
                             dmem_addr_o = 'x;
                         end
                     end
-                    /*casez({lsu_empty_i, lsu_load_i, dmem_done_i, lsu_instr_ready_i})
-            //WAIT:   casez({lsu_empty_i, lsu_load_last, dmem_done_i, lsu_instr_ready_i})
-                        4'b??0?:    begin
-                                        state_next = WAIT;
-                                    end
-                        4'b1?1?:    begin
-                                        state_next = IDLE;
-                                        cdb_load_o.tag = load_tag;
-                                        cdb_load_o.val = dmem_rd_data_i;
-                                    end
-                        4'b0011:    begin
-                                        if (lsu_specultative_i & ~lsu_corr_pred_i) begin
-                                            state_next = IDLE;
-                                        end else begin
-                                            state_next = STORE;
-                                        end
-                                        lsu_read_o = '1;
-                                        cdb_load_o.tag = load_tag;
-                                        cdb_load_o.val = dmem_rd_data_i;
-                                    end
-                        4'b0111:    begin
-                                        if (lsu_specultative_i & ~lsu_corr_pred_i) begin
-                                            state_next = IDLE;
-                                        end else begin
-                                            state_next = LOAD;
-                                        end
-                                        lsu_read_o = '1;
-                                        cdb_load_o.tag = load_tag;
-                                        cdb_load_o.val = dmem_rd_data_i;
-                                    end
-                        default:    begin
-                                        state_next = IDLE;
-                                        cdb_load_o.tag = load_tag;
-                                        cdb_load_o.val = dmem_rd_data_i;
-                                    end
-                    endcase*/
         endcase
     end
     
 
+    // Remember load tag when reading in load instruction
     always_ff @(posedge clk_i) begin
         if ((state_next == LOAD)) begin
             load_tag <= lsu_ld_tag_i;

@@ -1,3 +1,18 @@
+/*
+    CDB broadcast Unit
+    
+    Inputs:
+        cdb_t [NUM_RS_STATIONS-1:0]   fu_res_i:     functional unit results
+        logic                         clk_i:        system clock
+        put logic                     RST_i:        system reset
+
+    Outputs:
+        cdb_t                         broadcast_o:  CDB driver
+    
+    Description:
+        Selects between ready functional unit results to broadcast to system
+        Note: Load store unit must have highest priority (index: NUM_RS-1)
+*/
 
 `timescale 1ns/10ps
 

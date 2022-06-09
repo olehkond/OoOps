@@ -1,6 +1,42 @@
+/*
+    Instruction Fetch Unit
+    
+    Inputs:
+        logic     clk_i:            system clock
+        logic     reset_i:          system reset
+        logic     write_i:          signal that load store instruction is being issued
+        logic     load_i:           1 if load, 0 if store
+        rs_tag_t  addr_tag_i:       tag of address value (NO_VAL if ready as is)
+        word32_t  addr_i:           value of address (will be overwritten internally if not most up-to-date value)
+        word32_t  offset_i:         offset value in instruction encoding
+        rs_tag_t  data_st_tag_i:    tag of data value to be stored
+        word32_t  data_st_i,        value of data to be stored (ignored on load instruction)
+        logic     cond_eval_i:      has branch condition been evaluated?
+        logic     corr_pred_i:      was branch prediction correct
+        cdb_t     cdb_i:            common data bus for monitoring/updates
+        word32_t  dmem_rd_data_i:   value read from data memory
+        logic     dmem_done_i:      memory done performing load/store
+    
+
+    Outputs:
+        cdb_t    cdb_term_o:    loaded value broadcast
+        logic    full_o:        signal if all entries in load store are full (same function as RS bust bit)
+        cdb_t    cdb_load_o:          CDB value to be broadcast (on a load)
+        logic    dmem_read_o:         read signal to memory
+        logic    dmem_write_o:        write signal to memory
+        word32_t dmem_addr_o:         address to read or write to
+        word32_t dmem_data_o:         data to be written to memory (on store) 
+
+    Parameters:
+        SIZE_POW2:  Power of 2 of the number of entries in load-store unit
+
+    Description:
+        Handles load-store data memory interactions. Built in a FIFO structure.
+*/
+
+`timescale 1ns/10ps
 
 import data_types::*;
-
 
 module load_store_unit #(
     parameter SIZE_POW2 = 3
