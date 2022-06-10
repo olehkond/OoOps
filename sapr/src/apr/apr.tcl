@@ -109,4 +109,5 @@ verify_lvs > ./reports/lvs_report.txt
 
 #start_gui
 #report_timing
+quit
 
