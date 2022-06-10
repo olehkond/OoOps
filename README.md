@@ -23,7 +23,7 @@ OoOps is an Out-of-Order Execution Processor that implements a subset of RISCV (
     - **apr**: automatic place-and-route is run here, post-apr (netlist, sdf, and sdc) results and reports are outputted to this directory.
     - **verif**: post-syn and post-apr verification
 
-## Building and simulating the design 
+## Building and simulating the design: 
 Run `make` to generate all machine-level test programs, simulate all RTL testbenches, run the sapr flow, and run the top-level sapr testbenches.
 
 
