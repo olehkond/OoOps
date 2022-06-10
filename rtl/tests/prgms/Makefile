@@ -16,8 +16,6 @@ TARGETS = addi_instr_only.mem \
 		  fibonacci.mem
 
 
-#          alu_instr_only_with_noops.mem \
-
 all: $(TARGETS)
 
 addi_instr_only.mem: asm_gen/addi_instr_only.txt
@@ -26,9 +24,6 @@ addi_instr_only.mem: asm_gen/addi_instr_only.txt
 
 alu_instr_only.mem: asm_gen/alu_instr_only.txt
 	python3 ./asm_gen/convert_asm_file.py -i asm_gen/alu_instr_only.txt -o $@
-
-#alu_instr_only_with_noops.mem: asm_gen/alu_instr_only_with_noops.txt
-#	python3 ./asm_gen/convert_asm_file.py -i asm_gen/alu_instr_only_with_noops.txt -o $@
 
 alu_instr_OOO_test_1.mem: asm_gen/alu_instr_OOO_test_1.txt
 	python3 ./asm_gen/convert_asm_file.py -i asm_gen/alu_instr_OOO_test_1.txt -o $@
