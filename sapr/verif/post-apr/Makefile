@@ -27,9 +27,11 @@ all: $(TARGETS)
 $(VCS_FOLDER)/OoO_top.vpd: $(LOGS_FOLDER) $(VCS_FOLDER) $(OOO_TOP_FILES)
 	if [ ! -d $(LOGS_FOLDER) ]; then mkdir $(LOGS_FOLDER); fi
 	if [ ! -d $(VCS_FOLDER) ]; then mkdir $(VCS_FOLDER); fi
+	python3 ../../../rtl/tests/mem/init/gen_random_mem.py
 	vcs $(OOO_TOP_FILES) +v2k +vcs+vcdpluson +neg_tchk -R +lint=all -sverilog -full64 -debug_pp -timescale=1ns/10ps -l $(subst $(VCS_FOLDER),$(LOGS_FOLDER), $@).log
 	mv vcdplus.vpd $@
 	rm -r $(VCS_FILES_TO_CLEAN)
+	python3 verify_bubble_sort.py
 
 $(LOGS_FOLDER):
 	mkdir $@

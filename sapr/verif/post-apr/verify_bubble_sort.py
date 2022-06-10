@@ -15,16 +15,16 @@ res = open("bubble_sort_result.log", 'w')
 # Assuming no memory values are lower than -999
 last = -999
 
-res.write("READING SIMULATION RESULT MEMORY:")
+res.write("READING SIMULATION RESULT MEMORY:\n")
 
 for i in range(elements_to_sort):
-    str = mem.readline().replace(" ", '')
-    val = int(str)
-    res.write("\t" + val)
+    string = mem.readline().replace(" ", '')
+    val = int(string)
+    res.write("\t" + str(val) + '\n')
     if (val < last):
-        res.write("ERROR: ELEMENTS NOT SORTED IN ACCENDING ORDER")
+        res.write("ERROR: ELEMENTS NOT SORTED IN ACCENDING ORDER + '\n'")
         sys.exit()
 
-res.write("\n\n =================================")
-res.write("TEST PASSED")
+res.write("\n\n =================================\n")
+res.write("            TEST PASSED\n")
 res.write(" =================================")

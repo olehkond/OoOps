@@ -8,7 +8,7 @@ BASE = ../../src/verilog
 
 # Files necessary for simulation of module testbench
 OOO_TOP_FILES          = data_types.sv \
-						  /home/lab.apps/vlsiapps/kits/tsmc/N65RF/1.0c/digital/Front_End/verilog/tcbn65gplus_140b/tcbn65gplus.v \
+						 /home/lab.apps/vlsiapps/kits/tsmc/N65RF/1.0c/digital/Front_End/verilog/tcbn65gplus_140b/tcbn65gplus.v \
 						 basic_dmem_model.sv \
 						 ./OoO_top_tb.sv \
 						 ./OoO_top.syn.v \
@@ -27,9 +27,11 @@ all: $(TARGETS)
 $(VCS_FOLDER)/OoO_top.vpd: $(LOGS_FOLDER) $(VCS_FOLDER) $(OOO_TOP_FILES)
 	if [ ! -d $(LOGS_FOLDER) ]; then mkdir $(LOGS_FOLDER); fi
 	if [ ! -d $(VCS_FOLDER) ]; then mkdir $(VCS_FOLDER); fi
+	python3 ../../../rtl/tests/mem/init/gen_random_mem.py
 	vcs $(OOO_TOP_FILES) +v2k +vcs+vcdpluson +neg_tchk -R +lint=all -sverilog -full64 -debug_pp -timescale=1ns/10ps -l $(subst $(VCS_FOLDER),$(LOGS_FOLDER), $@).log
 	mv vcdplus.vpd $@
 	rm -r $(VCS_FILES_TO_CLEAN)
+	python3 verify_bubble_sort.py
 
 $(LOGS_FOLDER):
 	mkdir $@
