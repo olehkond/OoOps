@@ -28,7 +28,7 @@ FIFO_FILES             = ../data_types.sv ../fifo.sv ./fifo_tb.sv
 #RES_STATION_FILES      = $(BASE)/data_types.sv $(BASE)/res_station.sv ./res_station_tb.sv
 #REGFILE_FILES          = ../data_types.sv ../regfile.sv ./regfile_tb.sv
 PRIORITY_ENCODER_FILES = ../data_types.sv ../priority_encoder.sv ./priority_encoder_tb.sv
-ALU_FILES              = ../data_types.sv ../alu.sv ./alu_tb.sv
+#ALU_FILES              = ../data_types.sv ../alu.sv ./alu_tb.sv
 BROADCAST_CDB_FILES    = ../data_types.sv ../broadcast_cdb.sv ./broadcast_cdb_tb.sv ../priority_encoder.sv
 BASIC_DMEM_MODEL_FILES = ../data_types.sv ../basic_dmem_model.sv ./basic_dmem_model_tb.sv
 #LOAD_STORE_UNIT_FILES  = ../data_types.sv ../load_store_unit.sv ../dmem_read_write_unit.sv ../basic_dmem_model.sv ./load_store_unit_tb.sv
@@ -108,10 +108,10 @@ $(VCS_FOLDER)/priority_encoder.vpd: $(LOGS_FOLDER) $(VCS_FOLDER) $(PRIORITY_ENCO
 	mv vcdplus.vpd $@
 	rm -r $(VCS_FILES_TO_CLEAN)
 
-$(VCS_FOLDER)/alu.vpd: $(LOGS_FOLDER) $(VCS_FOLDER) $(ALU_FILES)
-	vcs $(ALU_FILES) +v2k -R +lint=all -sverilog -full64 -debug_pp -timescale=1ns/10ps -l $(subst $(VCS_FOLDER),$(LOGS_FOLDER), $@).log
-	mv vcdplus.vpd $@
-	rm -r $(VCS_FILES_TO_CLEAN)
+#$(VCS_FOLDER)/alu.vpd: $(LOGS_FOLDER) $(VCS_FOLDER) $(ALU_FILES)
+#	vcs $(ALU_FILES) +v2k -R +lint=all -sverilog -full64 -debug_pp -timescale=1ns/10ps -l $(subst $(VCS_FOLDER),$(LOGS_FOLDER), $@).log
+#	mv vcdplus.vpd $@
+#	rm -r $(VCS_FILES_TO_CLEAN)
 
 $(VCS_FOLDER)/broadcast_cdb.vpd: $(LOGS_FOLDER) $(VCS_FOLDER) $(BROADCAST_CDB_FILES)
 	vcs $(BROADCAST_CDB_FILES) +v2k -R +lint=all -sverilog -full64 -debug_pp -timescale=1ns/10ps -l $(subst $(VCS_FOLDER),$(LOGS_FOLDER), $@).log
@@ -136,11 +136,10 @@ $(VCS_FOLDER):
 	mkdir $@
 
 
-.PHONY: clean alu fifo top
+.PHONY: clean enc fifo top
 clean:
 	-rm $(LOGS_FOLDER)/* $(VCS_FOLDER)/*.vpd $(VCS_FOLDER)/sessions/*
 
 enc:     $(VCS_FOLDER)/priority_encoder.vpd
-alu:	 $(VCS_FOLDER)/alu.vpd
 fifo:    $(VCS_FOLDER)/fifo.vpd
 top:     $(VCS_FOLDER)/OoO_top.vpd

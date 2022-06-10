@@ -40,3 +40,4 @@ OoO_top_port_map.*
 *.vpd
 **/filenames*
 **/Synopsys_stack_trace*
+*.mem

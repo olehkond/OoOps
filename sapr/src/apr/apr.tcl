@@ -106,4 +106,5 @@ source ${SCRIPTS_DIR}/report_drcs.tcl -echo
 report_drc -highlight -color green
 
 start_gui
-report_timing
+#report_timing
+
