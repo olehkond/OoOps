@@ -64,9 +64,11 @@ all: $(TARGETS)
 
 # simulation entries
 $(VCS_FOLDER)/OoO_top.vpd: $(LOGS_FOLDER) $(VCS_FOLDER) $(OOO_TOP_FILES)
+	cd mem/init && $(MAKE)
 	vcs $(OOO_TOP_FILES) +v2k -R +lint=all -sverilog -full64 -debug_pp -timescale=1ns/10ps -l $(subst $(VCS_FOLDER),$(LOGS_FOLDER), $@).log
 	mv vcdplus.vpd $@
 	rm -r $(VCS_FILES_TO_CLEAN)
+	python3 verify_bubble_sort.py
 
 $(VCS_FOLDER)/fifo.vpd: $(LOGS_FOLDER) $(VCS_FOLDER) $(FIFO_FILES)
 	vcs $(FIFO_FILES) +v2k -R +lint=all -sverilog -full64 -debug_pp -timescale=1ns/10ps -l $(subst $(VCS_FOLDER),$(LOGS_FOLDER), $@).log

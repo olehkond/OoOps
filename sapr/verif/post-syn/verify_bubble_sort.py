@@ -10,7 +10,7 @@ elements_to_sort = 30
 
 
 mem = open("mem/sim_res/mem_end_state.mem", 'r')
-res = open("bubble_sort_result.log", 'w')
+res = open("BUBBLE_SORT_RESULT.log", 'w')
 
 # Assuming no memory values are lower than -999
 last = -999

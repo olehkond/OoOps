@@ -42,3 +42,4 @@ OoO_top_port_map.*
 **/Synopsys_stack_trace*
 *.mem
 **/bubble_sort_result.log
+**/BUBBLE_SORT_RESULT.log
