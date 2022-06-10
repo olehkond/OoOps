@@ -10,7 +10,7 @@ dmem_size_pow2 = 12
 mem_out_file = open("random.mem", "w")
 
 for i in range(2**(dmem_size_pow2-2)):
-    val = rd.randint(-300, 301)
+    val = rd.randint(-300, 300)
 
     if (val < 0):
         val = -flip_bits(val, 32)
