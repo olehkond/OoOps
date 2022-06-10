@@ -16,7 +16,6 @@ OoOps is an Out-of-Order Execution Processor that implements a subset of the RIS
 ## Directory Contents: 
 - **mwe**: source code and sapr scripts for a 5-stage pipeline CPU are located here 
 - **rtl**: contains OoOps RTL design 
-     incorporating load-store into the speculation scheme
     - **tests**: RTL verification. Contains includes top-level and module-level SystemVerilog testbenches
       - **prgms**: machine-level test programs (generated from source in *asm_gen/*)
         - **asm_gen**: contains assembly test programs and custom-RISCV assembler
