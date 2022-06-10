@@ -28,7 +28,7 @@ OoOps is an Out-of-Order Execution Processor that implements a subset of the RIS
 ## Building and simulating the design: 
 Run `make` to generate all machine-level test programs, simulate all RTL testbenches, run the sapr flow, and run the top-level sapr testbenches.
 
-Post-SAPR functionality is verified using a bubble sort test on a randomized memory input. To view the verification results, check the file at path `/sapr/verif/post-apr/BUBBLE_SORT_RESULT.log` to ensure that OoOps' bubble sort is consistent with the python bubble sort implementation. 
+Post-SAPR functionality is verified using a bubble sort test on a randomized memory input. To view the verification results, check the file at path `/sapr/verif/post-apr/BUBBLE_SORT_RESULT.log` to ensure that OoOps' bubble sort correctly sorts the relevant memory items into ascending order (w.r.t increasing memory address).
 
 
 
