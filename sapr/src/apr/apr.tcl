@@ -102,9 +102,11 @@ source ${SCRIPTS_DIR}/generate.tcl -echo
 
 # REPORT DRCS AS POPUP WINDOW
 # ==========================================================================
-source ${SCRIPTS_DIR}/report_drcs.tcl -echo
-report_drc -highlight -color green
+source ${SCRIPTS_DIR}/report_drcs.tcl -echo > ./reports/drc_lvs_report.txt
+report_drc > ./reports/drc_report.txt
+verify_lvs > ./reports/lvs_report.txt
+#report_drc -highlight -color green 
 
-start_gui
+#start_gui
 #report_timing
 
